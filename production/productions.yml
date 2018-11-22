@@ -1,0 +1,8 @@
+%YAML 1.1
+---
+ProdUofA_Paranal_SST70_Estim_North_20deg:
+  CORSIKA:
+    runs:
+      - corsika_estimate_01
+      - corsika_estimate_02
+      - corsika_estimate_03

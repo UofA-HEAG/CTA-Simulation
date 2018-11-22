@@ -1,0 +1,15 @@
+%YAML 1.1
+---
+build_01:
+  modules:
+    - GCCcore/6.3.0
+  tools:
+    gcc:
+      version: 6.3.0
+  outputs:
+    CORSIKA:
+      version: 6.990
+    IACT/ATMO:
+      version: 1.56
+    sim_telarray:
+      version: 1541504878

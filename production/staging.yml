@@ -1,0 +1,14 @@
+%YAML 1.1
+---
+cta_base:
+  scheduler: SLURM
+  parameters:
+    account: cta
+    partition: cpu
+    get-user-env: true
+    wait-all-nodes: true
+    ntasks: 1
+    cpus-per-task: 1
+    dependency: singleton
+    time: 3-00:00:00
+    mem-per-cpu: 512MB

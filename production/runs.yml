@@ -1,0 +1,52 @@
+%YAML 1.1
+---
+corsika_estimate_01:
+  summary: |
+    Compute times & disk storage estimation for CORSIKA
+    Using gamma, SSTOnly defaults, nshow=1000, max scatter radius = 1500m
+  task: CORSIKA
+  status: COMPLETED
+  parameters: ~/cta/CTA_MC/Data/corsika/run000005/input
+  build: build_01
+  staging:
+    base: cta_base
+    jobs:
+      - id: 13110892
+        submit: 2018-11-22 10:37:45+10:30
+        start: 2018-11-22 10:37:45+10:30
+        end: 2018-11-22 13:37:31+10:30
+  output: ~/cta/CTA_MC/Data/corsika/run000005
+corsika_estimate_02:
+  summary: |
+    Compute times & disk storage estimation for CORSIKA
+    Using protons, SSTOnly defaults, nshow=1000, max scatter radius = 1500m
+  task: CORSIKA
+  status: COMPLETED
+  parameters: ~/cta/CTA_MC/Data/corsika/run000003/input
+  build: build_01
+  staging:
+    base: cta_base
+    jobs:
+      - id: 13110815
+        submit: 2018-11-22 10:19:43+10:30
+        start: 2018-11-22 10:22:35+10:30
+        end: 2018-11-22 10:56:44+10:30
+        parameters:
+          mem: 512MB
+  output: ~/cta/CTA_MC/Data/corsika/run000003
+corsika_estimate_03:
+  summary: |
+    Compute times & disk storage estimation for CORSIKA
+    Using protons, SSTOnly defaults, nshow=1000, max scatter radius = 1500m, viewcone=20
+  task: CORSIKA
+  status: COMPLETED
+  parameters: ~/cta/CTA_MC/Data/corsika/run000004/input
+  build: build_01
+  staging:
+    base: cta_base
+    jobs:
+      - id: 13110853
+        submit: 2018-11-22 10:31:23+10:30
+        start: 2018-11-22 10:31:24+10:30
+        end: 2018-11-22 10:58:42+10:30
+  output: ~/cta/CTA_MC/Data/corsika/run000004
