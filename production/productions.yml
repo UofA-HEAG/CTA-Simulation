@@ -6,3 +6,14 @@ ProdUofA_Paranal_SST70_Estim_North_20deg:
       - corsika_estimate_01
       - corsika_estimate_02
       - corsika_estimate_03
+ProdUofA_Paranal_SST5_Estim_North_20deg:
+  CORSIKA:
+    runs:
+      - corsika_estimate_04
+      - corsika_estimate_05
+      - corsika_estimate_06
+  sim_telarray:
+    runs:
+      - simtel_estimate_01
+      - simtel_estimate_02
+      - simtel_estimate_03

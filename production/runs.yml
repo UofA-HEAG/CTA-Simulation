@@ -50,3 +50,104 @@ corsika_estimate_03:
         start: 2018-11-22 10:31:24+10:30
         end: 2018-11-22 10:58:42+10:30
   output: ~/cta/CTA_MC/Data/corsika/run000004
+corsika_estimate_04:
+  summary: |
+    Compute times & disk storage estimation for CORSIKA
+    Using gamma, 5 SSTs, nshow=1000, max scatter radius = 1500m
+  task: CORSIKA
+  status: COMPLETED
+  parameters: ~/cta/CTA_MC/Data/corsika/run000006/input
+  build: build_01
+  staging:
+    base: cta_base
+    jobs:
+      - id: 13121375
+        submit: 2018-11-23 10:01:55+10:30
+        start: 2018-11-23 10:01:56+10:30
+        end: 2018-11-23 13:03:55+10:30
+  output: ~/cta/CTA_MC/Data/corsika/run000006
+corsika_estimate_05:
+  summary: |
+    Compute times & disk storage estimation for CORSIKA
+    Using protons, 5 SSTs, nshow=1000, max scatter radius = 1500m
+  task: CORSIKA
+  status: COMPLETED
+  parameters: ~/cta/CTA_MC/Data/corsika/run000007/input
+  build: build_01
+  staging:
+    base: cta_base
+    jobs:
+      - id: 13121376
+        submit: 2018-11-23 10:02:36+10:30
+        start: 2018-11-23 10:02:38+10:30
+        end: 2018-11-23 10:30:04+10:30
+  output: ~/cta/CTA_MC/Data/corsika/run000007
+corsika_estimate_06:
+  summary: |
+    Compute times & disk storage estimation for CORSIKA
+    Using protons, 5 SSTs, nshow=1000, max scatter radius = 1500m, viewcone=20
+  task: CORSIKA
+  status: COMPLETED
+  parameters: ~/cta/CTA_MC/Data/corsika/run000008/input
+  build: build_01
+  staging:
+    base: cta_base
+    jobs:
+      - id: 13121377
+        submit: 2018-11-23 10:03:17+10:30
+        start: 2018-11-23 10:03:18+10:30
+        end: 2018-11-23 10:53:37+10:30
+  output: ~/cta/CTA_MC/Data/corsika/run000008
+simtel_estimate_01:
+  summary: |
+    Compute times & disk storage estimation for sim_telarray
+    Using output from corsika_estimate_04
+  task: sim_telarray
+  status: COMPLETED
+  parameters: ~/cta/CTA_MC/sim_telarray/multi/multi_cta-prod4-sst-astri+chec-s.cfg
+  build: build_01
+  staging:
+    base: cta_base
+    jobs:
+      - id: 13123030
+        submit: 2018-11-23 13:13:47+10:30
+        start: 2018-11-23 13:13:49+10:30
+        end: 2018-11-23 13:19:52+10:30
+        parameters:
+          time: 00:15:00
+  output: ~/cta/CTA_MC/Data/sim_telarray/cta-prod4-sst-astri+chec-s/0.0deg/Data/gamma_20deg_180deg_run6___cta-prod4-sst-astri+chec-s_desert-2150m-Paranal-sst-astri+chec-s.simtel.zst
+simtel_estimate_02:
+  summary: |
+    Compute times & disk storage estimation for sim_telarray
+    Using output from corsika_estimate_05
+  task: sim_telarray
+  status: COMPLETED
+  parameters: ~/cta/CTA_MC/sim_telarray/multi/multi_cta-prod4-sst-astri+chec-s.cfg
+  build: build_01
+  staging:
+    base: cta_base
+    jobs:
+      - id: 13122707
+        submit: 2018-11-23 12:46:58+10:30
+        start: 2018-11-23 12:46:58+10:30
+        end: 2018-11-23 12:47:15+10:30
+  output: ~/cta/CTA_MC/Data/sim_telarray/cta-prod4-sst-astri+chec-s/0.0deg/Data/proton_20deg_180deg_run7___cta-prod4-sst-astri+chec-s_desert-2150m-Paranal-sst-astri+chec-s.simtel.zst
+simtel_estimate_03:
+  summary: |
+    Compute times & disk storage estimation for sim_telarray
+    Using output from corsika_estimate_06
+  task: sim_telarray
+  status: COMPLETED
+  parameters: ~/cta/CTA_MC/sim_telarray/multi/multi_cta-prod4-sst-astri+chec-s.cfg
+  build: build_01
+  staging:
+    base: cta_base
+    jobs:
+      - id: 13122903
+        submit: 2018-11-23 12:59:21+10:30
+        start: 2018-11-23 12:59:22+10:30
+        end: 2018-11-23 12:59:29+10:30
+        parameters:
+          time: 00:15:00
+          mem-per-cpu: 4MB
+  output: proton_20deg_180deg_run8___cta-prod4-sst-astri+chec-s_desert-2150m-Paranal-sst-astri+chec-s.simtel.zst
