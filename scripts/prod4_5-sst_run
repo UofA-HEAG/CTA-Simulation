@@ -1,0 +1,254 @@
+#!/bin/bash
+
+# This script is for running a prod-4 5 SST simulation for Paranal.
+
+if [ "$1" = "--help" ]; then
+   echo "Run a Paranal (CTA-South) 5 SST (from baseline layout) simulation with"
+   echo "either storing only the CORSIKA IACT output (default) or full simulation with"
+   echo "prod-4 configurations for Paranal site, primary type, azimuth, and zenith angle."
+   echo ""
+   echo "Syntax: $0 [ option(s) ] site primary from_direction zenith_angle"
+   echo "   Site must be Paranal (default: Paranal)"
+   echo "   Primary can be any of gamma,gamma-diffuse,electron,proton,helium,... (default: gamma)"
+   echo "   From_direction can be any of North,South,East,West (default: South)"
+   echo "   Default zenith_angle is 20 deg."
+   echo ""
+   echo "Options:"
+   echo "   -B or --align-b-field : Turn off geomagnetic field declination (align to x/z plane)."
+   echo "   --with-telescope-simulation : Directly pipe into telescope simulation rather than"
+   echo "          storing just the CORSIKA IACT output."
+   echo "   --without-multipipe : Output directly to (compressed) file, without multipipe_corsika."
+   echo "   --with-multipipe : Output to (compressed) file produced via multipipe_corsika."
+   echo "   --full-range : Use the full energy range as for baseline simulations with LST+MST."
+   echo ""
+   echo "There are also a number of environment variables which can be used to control"
+   echo "the number of showers, the energy spectrum and core positions:"
+   echo "   NSHOW ESLOPE EMIN [TeV] EMAX [TeV] NSCAT CSCAT [m]"
+   echo ""
+   exit
+fi
+
+if [ -x ${HOME}/bin/init_batch_job ]; then
+   . ${HOME}/bin/init_batch_job
+fi
+
+# Top-level path under which we normally installed everything
+if [ -z "${CTA_PATH}" ]; then
+   if [ -d "pa-baseline/sim_telarray" ]; then
+      export CTA_PATH="$(pwd -P)/pa-baseline"
+   elif [ -d "demo/sim_telarray" ]; then
+      export CTA_PATH="$(pwd -P)/demo"
+   elif [ -d "sim_telarray" ]; then
+      export CTA_PATH="$(pwd -P)"
+   fi
+fi
+
+extras="-DWITHOUT_MULTIPIPE"
+extrab=""
+extrae=""
+with_simtel="0"
+
+# Use a loop to avoid dependence on order of options.
+for ((i=0; i<5; i++)); do
+   if [ "$1" = "--align-b-field" -o "$1" == "--align-B-field" -o "$1" = "-B" ]; then
+      shift
+      extrab="-DALIGN_B_FIELD"
+   elif [ "$1" = "--with-telescope-simulation" ]; then
+      shift
+      extras="-DWITH_TELESCOPE_SIMULATION"
+      with_simtel="1"
+   elif [ "$1" = "--without-multipipe" ]; then
+      shift
+      extras="-DWITHOUT_MULTIPIPE"
+      with_simtel="0"
+   elif [ "$1" = "--with-multipipe" ]; then
+      shift
+      extras=""
+      with_simtel="0"
+   elif [ "$1" = "--full-range" ]; then
+      shift
+      extrae="-DFULL_RANGE"
+      export extra_suffix2="-full"
+   else
+      break
+   fi
+done
+
+extra="${extras} ${extrab} ${extrae}"
+
+prod4site="Paranal"
+if [ ! -z "${PROD4_SITE}" ]; then
+   prod4site="${PROD4_SITE}"
+fi
+if [ ! -z "$1" ]; then
+   prod4site="$1"
+   shift
+fi
+export PROD4_SITE="${prod4site}"
+
+prod4primary="gamma"
+if [ ! -z "${PROD4_PRIMARY}" ]; then
+   prod4primary="${PROD4_PRIMARY}"
+fi
+if [ ! -z "$1" ]; then
+   prod4primary="$1"
+   shift
+fi
+export PROD4_PRIMARY="${prod4primary}"
+
+prod4pointing="South"
+if [ ! -z "${PROD4_POINTING}" ]; then
+   prod4pointing="${PROD4_POINTING}"
+fi
+if [ ! -z "$1" ]; then
+   prod4pointing="$1"
+   shift
+fi
+export PROD4_POINTING="${prod4pointing}"
+
+prod4zenith="20"
+if [ ! -z "${PROD4_ZENITH}" ]; then
+   prod4zenith="${PROD4_ZENITH}"
+fi
+if [ ! -z "$1" ]; then
+   prod4zenith="$1"
+   shift
+fi
+export PROD4_ZENITH="${prod4zenith}"
+
+input_tmpl="INPUTS_CTA_PROD4-${prod4site}-5-SST-template-${prod4zenith}deg"
+site_type="CTA-South"
+prod_base="INPUTS_CTA_PROD4-${prod4site}-5-SST"
+defs=""
+
+case "$prod4site" in
+   Paranal)
+      defs="-DSITE_PARANAL"
+      site_type="CTA-South"
+      ;;
+   *)
+      echo "Undefined Prod-4 SST site $prod4site"
+      exit 1
+      ;;
+esac
+
+case "$prod4primary" in
+   gamma|g)
+      defs="${defs} -DPRIMARY_GAMMA"
+      prod4primary="gamma"
+      ;;
+   gamma-diffuse|gamma_diffuse|diffuse)
+      defs="${defs} -DPRIMARY_GAMMA_DIFFUSE"
+      prod4primary="gamma_diffuse"
+      ;;
+   electron|e)
+      defs="${defs} -DPRIMARY_ELECTRON"
+      prod4primary="electron"
+      ;;
+   proton|p)
+      defs="${defs} -DPRIMARY_PROTON"
+      prod4primary="proton"
+      ;;
+   Helium|helium|He|he)
+      defs="${defs} -DPRIMARY_HELIUM"
+      prod4primary="helium"
+      ;;
+   Nitrogen|nitrogen|N|n)
+      defs="${defs} -DPRIMARY_NITROGEN"
+      prod4primary="nitrogen"
+      ;;
+   Silicon|silicon|Si|si)
+      defs="${defs} -DPRIMARY_SILICON"
+      prod4primary="silicon"
+      ;;
+   Iron|iron|Fe|fe)
+      defs="${defs} -DPRIMARY_IRON"
+      prod4primary="iron"
+      ;;
+   *)
+      echo "Undefined primary type $prod4primary"
+      exit 1
+      ;;
+esac
+
+case "$prod4pointing" in
+   North|north|N)
+      defs="${defs} -DFROM_NORTH"
+      prod4pointing="North"
+      ;;
+   South|south|S)
+      defs="${defs} -DFROM_SOUTH"
+      prod4pointing="South"
+      ;;
+   East|east|E)
+      defs="${defs} -DFROM_EAST"
+      prod4pointing="East"
+      ;;
+   West|west|W)
+      defs="${defs} -DFROM_WEST"
+      prod4pointing="West"
+      ;;
+   *)
+      echo "Undefined pointing direction $prod4pointing"
+      exit 1
+      ;;
+esac
+
+export CTA_PATH=~/cta/CTA_MC
+
+. ${CTA_PATH}/examples_common.sh
+
+echo ""
+echo "This is a prod-4 ${prod4site} 5 SST run with primaries of type ${prod4primary} from ${prod4pointing} at z=${prod4zenith} deg."
+if [ "${with_simtel}" = "1" ]; then
+   echo "Output is piped into telescope simulation for all relevant SST configurations."
+else
+   echo "Output from CORSIKA IACT interface is stored for later processing."
+fi
+echo ""
+
+cd ${CORSIKA_DATA} || exit 1
+
+inputs_tmp="inputs.tmp.${HOSTNAME}.$$.${prod4site}.${prod4primary}.${prod4pointing}.${prod4zenith}"
+
+if [ ! -z "${NSHOW}" ]; then
+   defs="${defs} -DNSHOW=${NSHOW}"
+fi
+if [ ! -z "${ESLOPE}" ]; then
+   defs="${defs} -DESLOPE=${ESLOPE}"
+fi
+if [ ! -z "${EMIN}" ]; then
+   defs="${defs} -DEMIN=${EMIN}"
+fi
+if [ ! -z "${EMAX}" ]; then
+   defs="${defs} -DEMAX=${EMAX}"
+fi
+if [ ! -z "${NSCAT}" ]; then
+   defs="${defs} -DNSCAT=${NSCAT}"
+fi
+if [ ! -z "${CSCAT}" ]; then
+   defs="${defs} -DCSCAT=${CSCAT}"
+fi
+
+# Note: preprocessing with cpp would also work but pfp is less intrusive (retains comments, no '# nn' lines added).
+${SIM_TELARRAY_PATH}/bin/pfp -V $defs $extra - < ${CORSIKA_PATH}/${input_tmpl} \
+   > "$inputs_tmp"
+
+${SIM_TELARRAY_PATH}/bin/corsika_autoinputs \
+  --run ${CORSIKA_PATH}/corsika \
+  -p ${CORSIKA_DATA} \
+  "$inputs_tmp" || exit 1
+
+echo "Waiting 30 seconds for output pipes to get finished ..."
+sleep 30
+
+rm "$inputs_tmp"
+
+echo ""
+echo "CTA Prod-4 5 SST run for site $prod4site, primary $prod4primary, showers coming from $prod4pointing, zenith angle $prod4zenith complete."
+echo ""
+if [ ! -z "${FINDDATA}" ]; then
+   echo "New data:"
+   find ${SIM_TELARRAY_DATA} -type f -mmin -1 | sed 's:^.*/\(Data/sim.*\)$:\1:'
+   echo ""
+fi
