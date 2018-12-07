@@ -10,11 +10,11 @@ corsika_estimate_01:
   build: build_01
   staging:
     base: cta_base
-    jobs:
-      - id: 13110892
-        submit: 2018-11-22 10:37:45+10:30
-        start: 2018-11-22 10:37:45+10:30
-        end: 2018-11-22 13:37:31+10:30
+    job:
+      id: 13110892
+      submit: 2018-11-22 10:37:45+10:30
+      start: 2018-11-22 10:37:45+10:30
+      end: 2018-11-22 13:37:31+10:30
   output: ~/cta/CTA_MC/Data/corsika/run000005
 corsika_estimate_02:
   summary: |
@@ -26,13 +26,13 @@ corsika_estimate_02:
   build: build_01
   staging:
     base: cta_base
-    jobs:
-      - id: 13110815
-        submit: 2018-11-22 10:19:43+10:30
-        start: 2018-11-22 10:22:35+10:30
-        end: 2018-11-22 10:56:44+10:30
-        parameters:
-          mem: 512MB
+    job:
+      id: 13110815
+      submit: 2018-11-22 10:19:43+10:30
+      start: 2018-11-22 10:22:35+10:30
+      end: 2018-11-22 10:56:44+10:30
+      parameters:
+        mem: 512MB
   output: ~/cta/CTA_MC/Data/corsika/run000003
 corsika_estimate_03:
   summary: |
@@ -44,11 +44,11 @@ corsika_estimate_03:
   build: build_01
   staging:
     base: cta_base
-    jobs:
-      - id: 13110853
-        submit: 2018-11-22 10:31:23+10:30
-        start: 2018-11-22 10:31:24+10:30
-        end: 2018-11-22 10:58:42+10:30
+    job:
+      id: 13110853
+      submit: 2018-11-22 10:31:23+10:30
+      start: 2018-11-22 10:31:24+10:30
+      end: 2018-11-22 10:58:42+10:30
   output: ~/cta/CTA_MC/Data/corsika/run000004
 corsika_estimate_04:
   summary: |
@@ -60,11 +60,11 @@ corsika_estimate_04:
   build: build_01
   staging:
     base: cta_base
-    jobs:
-      - id: 13121375
-        submit: 2018-11-23 10:01:55+10:30
-        start: 2018-11-23 10:01:56+10:30
-        end: 2018-11-23 13:03:55+10:30
+    job:
+      id: 13121375
+      submit: 2018-11-23 10:01:55+10:30
+      start: 2018-11-23 10:01:56+10:30
+      end: 2018-11-23 13:03:55+10:30
   output: ~/cta/CTA_MC/Data/corsika/run000006
 corsika_estimate_05:
   summary: |
@@ -76,11 +76,11 @@ corsika_estimate_05:
   build: build_01
   staging:
     base: cta_base
-    jobs:
-      - id: 13121376
-        submit: 2018-11-23 10:02:36+10:30
-        start: 2018-11-23 10:02:38+10:30
-        end: 2018-11-23 10:30:04+10:30
+    job:
+      id: 13121376
+      submit: 2018-11-23 10:02:36+10:30
+      start: 2018-11-23 10:02:38+10:30
+      end: 2018-11-23 10:30:04+10:30
   output: ~/cta/CTA_MC/Data/corsika/run000007
 corsika_estimate_06:
   summary: |
@@ -92,11 +92,11 @@ corsika_estimate_06:
   build: build_01
   staging:
     base: cta_base
-    jobs:
-      - id: 13121377
-        submit: 2018-11-23 10:03:17+10:30
-        start: 2018-11-23 10:03:18+10:30
-        end: 2018-11-23 10:53:37+10:30
+    job:
+      id: 13121377
+      submit: 2018-11-23 10:03:17+10:30
+      start: 2018-11-23 10:03:18+10:30
+      end: 2018-11-23 10:53:37+10:30
   output: ~/cta/CTA_MC/Data/corsika/run000008
 simtel_estimate_01:
   summary: |
@@ -108,13 +108,13 @@ simtel_estimate_01:
   build: build_01
   staging:
     base: cta_base
-    jobs:
-      - id: 13123030
-        submit: 2018-11-23 13:13:47+10:30
-        start: 2018-11-23 13:13:49+10:30
-        end: 2018-11-23 13:19:52+10:30
-        parameters:
-          time: 00:15:00
+    job:
+      id: 13123030
+      submit: 2018-11-23 13:13:47+10:30
+      start: 2018-11-23 13:13:49+10:30
+      end: 2018-11-23 13:19:52+10:30
+      parameters:
+        time: 00:15:00
   output: ~/cta/CTA_MC/Data/sim_telarray/cta-prod4-sst-astri+chec-s/0.0deg/Data/gamma_20deg_180deg_run6___cta-prod4-sst-astri+chec-s_desert-2150m-Paranal-sst-astri+chec-s.simtel.zst
 simtel_estimate_02:
   summary: |
@@ -126,11 +126,11 @@ simtel_estimate_02:
   build: build_01
   staging:
     base: cta_base
-    jobs:
-      - id: 13122707
-        submit: 2018-11-23 12:46:58+10:30
-        start: 2018-11-23 12:46:58+10:30
-        end: 2018-11-23 12:47:15+10:30
+    job:
+      id: 13122707
+      submit: 2018-11-23 12:46:58+10:30
+      start: 2018-11-23 12:46:58+10:30
+      end: 2018-11-23 12:47:15+10:30
   output: ~/cta/CTA_MC/Data/sim_telarray/cta-prod4-sst-astri+chec-s/0.0deg/Data/proton_20deg_180deg_run7___cta-prod4-sst-astri+chec-s_desert-2150m-Paranal-sst-astri+chec-s.simtel.zst
 simtel_estimate_03:
   summary: |
@@ -142,12 +142,12 @@ simtel_estimate_03:
   build: build_01
   staging:
     base: cta_base
-    jobs:
-      - id: 13122903
-        submit: 2018-11-23 12:59:21+10:30
-        start: 2018-11-23 12:59:22+10:30
-        end: 2018-11-23 12:59:29+10:30
-        parameters:
-          time: 00:15:00
-          mem-per-cpu: 4MB
+    job:
+      id: 13122903
+      submit: 2018-11-23 12:59:21+10:30
+      start: 2018-11-23 12:59:22+10:30
+      end: 2018-11-23 12:59:29+10:30
+      parameters:
+        time: 00:15:00
+        mem-per-cpu: 4MB
   output: proton_20deg_180deg_run8___cta-prod4-sst-astri+chec-s_desert-2150m-Paranal-sst-astri+chec-s.simtel.zst
