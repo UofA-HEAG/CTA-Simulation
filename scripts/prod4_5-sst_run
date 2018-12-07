@@ -22,8 +22,8 @@ if [ "$1" = "--help" ]; then
    echo "   --full-range : Use the full energy range as for baseline simulations with LST+MST."
    echo ""
    echo "There are also a number of environment variables which can be used to control"
-   echo "the number of showers, the energy spectrum and core positions:"
-   echo "   NSHOW ESLOPE EMIN [TeV] EMAX [TeV] NSCAT CSCAT [m]"
+   echo "the number of showers, the energy spectrum, core positions and view cone radius:"
+   echo "   NSHOW ESLOPE EMIN [TeV] EMAX [TeV] NSCAT CSCAT [m] VIEWCONE [deg]"
    echo ""
    exit
 fi
@@ -228,6 +228,9 @@ if [ ! -z "${NSCAT}" ]; then
 fi
 if [ ! -z "${CSCAT}" ]; then
    defs="${defs} -DCSCAT=${CSCAT}"
+fi
+if [ ! -z "${VIEWCONE}" ]; then
+   defs="${defs} -DVIEWCONE=${VIEWCONE}"
 fi
 
 # Note: preprocessing with cpp would also work but pfp is less intrusive (retains comments, no '# nn' lines added).

@@ -155,10 +155,14 @@ PHIP   180. 180.        // Range of azimuth angles (degree): primaries coming fr
 # endif
 IACT setenv AZM 0       // That is the astronomical azimuth, from geographical North towards East.
 #endif
+#ifndef VIEWCONE
 #ifndef DIFFUSE
 VIEWCONE 0. 0.        // Can be a cone around fixed THETAP/PHIP (gamma point source)
 #else
 VIEWCONE 0. 10.     // Diffuse components (gammas, electrons, protons & nuclei)
+#endif
+#else
+VIEWCONE 0. $(VIEWCONE)  // User-defined cone around fixed THETAP/PHIP (gamma point source)
 #endif
 *
 *  Optionally override prepared demo run settings
