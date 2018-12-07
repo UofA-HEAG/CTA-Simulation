@@ -1,0 +1,112 @@
+#!/bin/bash
+
+# This script is for sim_telarray processing of a prod-4 SST-only simulation for Paranal.
+
+if [ "$1" = "--help" ]; then
+   echo "Run the telescope simulation (sim_telarray) part after the CORSIKA-only part of"
+   echo "a Paranal (CTA-South) SST-only (from baseline layout) simulation."
+   echo ""
+   echo "Syntax: $0 [ -p ] run-number(s)"
+   echo ""
+   exit
+fi
+
+if [ -x ${HOME}/bin/init_batch_job ]; then
+   . ${HOME}/bin/init_batch_job
+fi
+
+parallel=0
+if [ "$1" = "-p" ]; then
+   parallel=1
+   shift
+fi
+
+# Top-level path under which we normally installed everything
+if [ -z "${CTA_PATH}" ]; then
+   if [ -d "pa-baseline/sim_telarray" ]; then
+      export CTA_PATH="$(pwd -P)/pa-baseline"
+   elif [ -d "demo/sim_telarray" ]; then
+      export CTA_PATH="$(pwd -P)/demo"
+   elif [ -d "sim_telarray" ]; then
+      export CTA_PATH="$(pwd -P)"
+   fi
+fi
+
+prod4site="Paranal"
+export PROD4_SITE="${prod4site}"
+
+case "$prod4site" in
+   Paranal)
+      defs="-DSITE_PARANAL"
+      site_type="CTA-South"
+      ;;
+   *)
+      echo "Undefined Prod-4 SST site $prod4site"
+      exit 1
+      ;;
+esac
+
+export CTA_PATH=~/cta/CTA_MC
+
+. ${CTA_PATH}/examples_common.sh
+
+echo ""
+echo "This is the sim_telarray part of prod-4 ${prod4site} SST-only  simulation runs" "$@"
+echo "Existing CORSIKA data files are piped into telescope simulation for all relevant SST configurations."
+echo ""
+
+# cd ${CORSIKA_DATA} || exit 1
+
+cd ${SIM_TELARRAY_PATH} || exit 1
+
+for crun in "$@"; do
+
+  cdir=$(printf "run%06d" $crun )
+
+  if [ -e ${CORSIKA_DATA}/${cdir}/.simtel_processing -o -e ${CORSIKA_DATA}/${cdir}/.simtel_done ]; then
+     echo ""
+     echo "=============================================="
+     if [ -e ${CORSIKA_DATA}/${cdir}/.simtel_done ]; then
+	echo "Run $crun is marked as in finished. Skipped."
+     elif [ -e ${CORSIKA_DATA}/${cdir}/.simtel_processing ]; then
+	echo "Run $crun is marked as in processing. Skipped."
+     fi
+     echo "=============================================="
+     continue
+  fi
+
+  touch ${CORSIKA_DATA}/${cdir}/.simtel_processing
+
+  for cfile in ${CORSIKA_DATA}/${cdir}/*.corsika*; do
+
+    echo ""
+    echo "=================================================================================================="
+    echo "Processing now CORSIKA run $crun, file $cfile"
+    echo "=================================================================================================="
+    echo ""
+    
+    export extension="zst"
+    echo "Processing ASTRI/CHEC-S ..."
+    echo "sst-astri+chec-s: $cfile" > ${CORSIKA_DATA}/${cdir}/.simtel_progress
+    bin/multipipe_corsika -c multi/multi_cta-prod4-sst-astri+chec-s.cfg $cfile 
+
+    echo "Done with all configurations."
+    rm ${CORSIKA_DATA}/${cdir}/.simtel_progress
+
+  done
+
+  touch ${CORSIKA_DATA}/${cdir}/.simtel_done
+  # Note: keep the .simtel_processing file to see easiky how long it took to process this run.
+
+done
+
+
+echo ""
+echo "CTA Prod-4 SST-only run(s)" "$@" "telescope simulation should be complete now."
+echo ""
+
+if [ ! -z "${FINDDATA}" ]; then
+   echo "New data:"
+   find ${SIM_TELARRAY_DATA} -type f -mmin -1 | sed 's:^.*/\(Data/sim.*\)$:\1:'
+   echo ""
+fi
