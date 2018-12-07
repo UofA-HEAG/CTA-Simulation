@@ -158,7 +158,7 @@ IACT setenv AZM 0       // That is the astronomical azimuth, from geographical N
 #ifndef DIFFUSE
 VIEWCONE 0. 0.        // Can be a cone around fixed THETAP/PHIP (gamma point source)
 #else
-VIEWCONE 0. 20.     // Diffuse components (gammas, electrons, protons & nuclei)
+VIEWCONE 0. 10.     // Diffuse components (gammas, electrons, protons & nuclei)
 #endif
 *
 *  Optionally override prepared demo run settings
