@@ -151,3 +151,37 @@ simtel_estimate_03:
         time: 00:15:00
         mem-per-cpu: 4MB
   output: proton_20deg_180deg_run8___cta-prod4-sst-astri+chec-s_desert-2150m-Paranal-sst-astri+chec-s.simtel.zst
+corsika_flat_spectrum_01:
+  summary: |
+    Run CORSIKA with a flat energy spectrum
+    Uses same gamma parametrs from corsika_estimate_01
+    Energy range from 100 GeV - 330 TeV
+  task: CORSIKA
+  status: RUNNING
+  parameters: ~/cta/CTA_MC/Data/corsika/run000010/input
+  build: build_01
+  staging:
+    base: cta_base
+    job:
+      id: 13310488
+      submit: 2018-12-10 16:11:08+10:30
+      start: 2018-12-10 16:11:09+10:30
+      end:
+  output: ~/cta/CTA_MC/Data/corsika/run000010
+corsika_flat_spectrum_02:
+  summary: |
+    Run CORSIKA with a flat energy spectrum
+    Uses same gamma parametrs from corsika_estimate_01
+    Energy range from 1 - 10 TeV
+  task: CORSIKA
+  status: RUNNING
+  parameters: ~/cta/CTA_MC/Data/corsika/run000011/input
+  build: build_01
+  staging:
+    base: cta_base
+    job:
+      id: 13314056
+      submit: 2018-12-11 01:02:58+10:30
+      start: 2018-12-11 01:02:58+10:30
+      end:
+  output: ~/cta/CTA_MC/Data/corsika/run000011
