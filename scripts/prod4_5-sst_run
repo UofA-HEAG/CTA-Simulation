@@ -116,7 +116,13 @@ if [ ! -z "$1" ]; then
 fi
 export PROD4_ZENITH="${prod4zenith}"
 
-input_tmpl="INPUTS_CTA_PROD4-${prod4site}-5-SST-template-${prod4zenith}deg"
+flatspec=""
+# Check to see if FLAT_SPECTRUM is set
+if [ ! -z ${FLAT_SPECTRUM+x} ]; then
+   flatspec="-flat-spectrum"
+fi
+
+input_tmpl="INPUTS_CTA_PROD4-${prod4site}-5-SST-template-${prod4zenith}deg${flatspec}"
 site_type="CTA-South"
 prod_base="INPUTS_CTA_PROD4-${prod4site}-5-SST"
 defs=""
