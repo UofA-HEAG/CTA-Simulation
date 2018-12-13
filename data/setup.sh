@@ -15,4 +15,3 @@ WORK_PATH="$( cd -P "$( dirname "$SOURCE" )" >/dev/null && pwd )"
 
 # Link files
 ln -sf ${WORK_PATH}/INPUTS_CTA_PROD4-Paranal-5-SST-template-20deg ${CTA_PATH}/corsika-run
-ln -sf ${WORK_PATH}/INPUTS_CTA_PROD4-Paranal-5-SST-template-20deg-flat-spectrum ${CTA_PATH}/corsika-run
