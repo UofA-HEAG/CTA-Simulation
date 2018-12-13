@@ -154,10 +154,10 @@ simtel_estimate_03:
 corsika_flat_spectrum_01:
   summary: |
     Run CORSIKA with a flat energy spectrum
-    Uses same gamma parametrs from corsika_estimate_01
+    Uses same gamma parameters from corsika_estimate_01
     Energy range from 100 GeV - 330 TeV
   task: CORSIKA
-  status: RUNNING
+  status: CANCELLED
   parameters: ~/cta/CTA_MC/Data/corsika/run000010/input
   build: build_01
   staging:
@@ -166,15 +166,15 @@ corsika_flat_spectrum_01:
       id: 13310488
       submit: 2018-12-10 16:11:08+10:30
       start: 2018-12-10 16:11:09+10:30
-      end:
+      end: 2018-12-13 16:11:37+10:30
   output: ~/cta/CTA_MC/Data/corsika/run000010
 corsika_flat_spectrum_02:
   summary: |
     Run CORSIKA with a flat energy spectrum
-    Uses same gamma parametrs from corsika_estimate_01
+    Uses same gamma parameters from corsika_estimate_01
     Energy range from 1 - 10 TeV
   task: CORSIKA
-  status: RUNNING
+  status: COMPLETED
   parameters: ~/cta/CTA_MC/Data/corsika/run000011/input
   build: build_01
   staging:
@@ -183,5 +183,62 @@ corsika_flat_spectrum_02:
       id: 13314056
       submit: 2018-12-11 01:02:58+10:30
       start: 2018-12-11 01:02:58+10:30
-      end:
+      end: 2018-12-11 18:36:59+10:30
   output: ~/cta/CTA_MC/Data/corsika/run000011
+corsika_flat_spectrum_03:
+  summary: |
+    Run CORSIKA with a flat energy spectrum
+    Uses same gamma parameters from corsika_estimate_01
+    Energy range from 10 - 100 TeV
+  task: CORSIKA
+  status: RUNNING
+  parameters: ~/cta/CTA_MC/Data/corsika/run000012/input
+  build: build_01
+  staging:
+    base: cta_base
+    job:
+      id: 13333998
+      submit: 2018-12-12 13:46:29+10:30
+      start: 2018-12-12 13:46:30+10:30
+      end:
+  output: ~/cta/CTA_MC/Data/corsika/run000012
+corsika_flat_spectrum_array_01:
+  summary: |
+    Run CORSIKA with a flat energy spectrum
+    Uses same gamma parameters from corsika_estimate_01
+    Energy range from 1 - 6 TeV
+    2 array jobs, test run
+  task: CORSIKA
+  status: RUNNING
+  parameters: ~/cta/CTA_MC/Data/corsika/run0000{13-14}/input
+  build: build_01
+  staging:
+    base: cta_base
+    job:
+      id: 13341653
+      submit: 2018-12-13 16:40:57+10:30
+      start: 2018-12-13 16:40:59+10:30
+      end:
+      parameters:
+        array: 0-1
+  output: ~/cta/CTA_MC/Data/corsika/run0000{13-14}
+corsika_flat_spectrum_array_02:
+  summary: |
+    Run CORSIKA with a flat energy spectrum
+    Uses same gamma parameters from corsika_estimate_01
+    Energy range from 5 - 400 TeV
+    79 array jobs
+  task: CORSIKA
+  status: RUNNING
+  parameters: ~/cta/CTA_MC/Data/corsika/run0000{15-..}/input
+  build: build_01
+  staging:
+    base: cta_base
+    job:
+      id: 13341753
+      submit: 2018-12-13 16:46:15+10:30
+      start: 2018-12-13 16:46:18+10:30
+      end:
+      parameters:
+        array: 0-78
+  output: ~/cta/CTA_MC/Data/corsika/run0000{15-..}
