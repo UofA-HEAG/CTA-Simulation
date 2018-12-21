@@ -191,7 +191,7 @@ corsika_flat_spectrum_03:
     Uses same gamma parameters from corsika_estimate_01
     Energy range from 10 - 100 TeV
   task: CORSIKA
-  status: RUNNING
+  status: CANCELLED
   parameters: ~/cta/CTA_MC/Data/corsika/run000012/input
   build: build_01
   staging:
@@ -200,7 +200,7 @@ corsika_flat_spectrum_03:
       id: 13333998
       submit: 2018-12-12 13:46:29+10:30
       start: 2018-12-12 13:46:30+10:30
-      end:
+      end: 2018-12-13 23:59:30+10:30
   output: ~/cta/CTA_MC/Data/corsika/run000012
 corsika_flat_spectrum_array_01:
   summary: |
@@ -209,8 +209,8 @@ corsika_flat_spectrum_array_01:
     Energy range from 1 - 6 TeV
     2 array jobs, test run
   task: CORSIKA
-  status: RUNNING
-  parameters: ~/cta/CTA_MC/Data/corsika/run0000{13-14}/input
+  status: COMPLETED
+  parameters: ~/cta/CTA_MC/Data/corsika/run0000{13..14}/input
   build: build_01
   staging:
     base: cta_base
@@ -218,10 +218,10 @@ corsika_flat_spectrum_array_01:
       id: 13341653
       submit: 2018-12-13 16:40:57+10:30
       start: 2018-12-13 16:40:59+10:30
-      end:
+      end: 2018-12-13 23:40:19+10:30
       parameters:
         array: 0-1
-  output: ~/cta/CTA_MC/Data/corsika/run0000{13-14}
+  output: ~/cta/CTA_MC/Data/corsika/run0000{13..14}
 corsika_flat_spectrum_array_02:
   summary: |
     Run CORSIKA with a flat energy spectrum
@@ -229,8 +229,8 @@ corsika_flat_spectrum_array_02:
     Energy range from 5 - 400 TeV
     79 array jobs
   task: CORSIKA
-  status: RUNNING
-  parameters: ~/cta/CTA_MC/Data/corsika/run0000{15-..}/input
+  status: COMPLETED
+  parameters: ~/cta/CTA_MC/Data/corsika/run0000{15..93}/input
   build: build_01
   staging:
     base: cta_base
@@ -238,7 +238,7 @@ corsika_flat_spectrum_array_02:
       id: 13341753
       submit: 2018-12-13 16:46:15+10:30
       start: 2018-12-13 16:46:18+10:30
-      end:
+      end: 2018-12-14 02:28:38+10:30
       parameters:
         array: 0-78
-  output: ~/cta/CTA_MC/Data/corsika/run0000{15-..}
+  output: ~/cta/CTA_MC/Data/corsika/run0000{15..93}
