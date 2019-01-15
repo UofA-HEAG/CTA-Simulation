@@ -10,7 +10,7 @@
 #SBATCH --cpus-per-task=1
 #SBATCH --dependency=singleton
 
-#SBATCH --time=3-00:00:00
+#SBATCH --time=1-00:00:00
 #SBATCH --mem-per-cpu=512MB
 
 #SBATCH -J corsika_flat_spectrum_array_02
@@ -46,7 +46,8 @@ echo "EMAX =" $EMAX
 echo "============================="
 echo
 
-export NSHOW=1000
+# 1000/78 ~ 13 showers
+export NSHOW=13
 # These tell CORSIKA how many copies of the shower/telescope array need to be duplicated around a radius of CSCAT (in metres)
 # Should be 20, not 10, maybe?
 export NSCAT=10
