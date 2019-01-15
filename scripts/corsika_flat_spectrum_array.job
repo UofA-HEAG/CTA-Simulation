@@ -1,0 +1,55 @@
+#!/bin/bash
+
+#SBATCH --account=cta
+#SBATCH --partition=cpu
+#SBATCH --get-user-env
+#SBATCH --wait-all-nodes=1
+
+#SBATCH --array=0-78
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=1
+#SBATCH --dependency=singleton
+
+#SBATCH --time=3-00:00:00
+#SBATCH --mem-per-cpu=512MB
+
+#SBATCH -J corsika_flat_spectrum_array_02
+
+#SBATCH --mail-user=a1648400@adelaide.edu.au
+#SBATCH --mail-type=ALL
+
+export OMP_NUM_THREADS=1
+cd $SLURM_SUBMIT_DIR
+ulimit -s unlimited
+
+# scale for bc
+scale=16
+round=1
+
+# 1 - 6 TeV
+# 5 - 400 TeV
+ELOW=5.0
+EHIGH=400.0
+
+SCALELOW=$( bc <<< "scale=${scale};${SLURM_ARRAY_TASK_ID}/${SLURM_ARRAY_TASK_COUNT}" )
+SCALEHIGH=$( bc <<< "scale=${scale};(${SLURM_ARRAY_TASK_ID} + 1)/${SLURM_ARRAY_TASK_COUNT}" )
+
+# CORSIKA parameters
+
+export ESLOPE=0.0
+export EMIN=$( bc <<< "scale=${scale};${ELOW} + ${SCALELOW} * (${EHIGH} - ${ELOW})" | xargs printf "%.*f" $round )
+export EMAX=$( bc <<< "scale=${scale};${ELOW} + ${SCALEHIGH} * (${EHIGH} - ${ELOW})" | xargs printf "%.*f" $round )
+
+echo "===== Array job #${SLURM_ARRAY_TASK_ID} of ${SLURM_ARRAY_TASK_COUNT} ====="
+echo "EMIN =" $EMIN
+echo "EMAX =" $EMAX
+echo "============================="
+echo
+
+export NSHOW=1000
+# These tell CORSIKA how many copies of the shower/telescope array need to be duplicated around a radius of CSCAT (in metres)
+# Should be 20, not 10, maybe?
+export NSCAT=10
+export CSCAT=1500
+
+~/cta/CTA-Simulation/scripts/prod4_5-sst_run Paranal gamma

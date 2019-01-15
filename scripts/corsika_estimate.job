@@ -1,0 +1,32 @@
+#!/bin/bash
+
+#SBATCH --account=cta
+#SBATCH --partition=cpu
+#SBATCH --get-user-env
+#SBATCH --wait-all-nodes=1
+
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=1
+#SBATCH --dependency=singleton
+
+#SBATCH --time=3-00:00:00
+#SBATCH --mem-per-cpu=512MB
+
+#SBATCH -J corsika_estimate_06
+
+#SBATCH --mail-user=a1648400@adelaide.edu.au
+#SBATCH --mail-type=ALL
+
+export OMP_NUM_THREADS=1
+cd $SLURM_SUBMIT_DIR
+ulimit -s unlimited
+
+# CORSIKA parameters
+
+export NSHOW=1000
+# These tell CORSIKA how many copies of the shower/telescope array need to be duplicated around a radius of CSCAT (in metres)
+# Should be 20, not 10, maybe?
+export NSCAT=10
+export CSCAT=1500
+
+~/cta/CTA_MC/example_scripts/Prod4/prod4_5-sst_run Paranal proton
