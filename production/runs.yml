@@ -266,7 +266,7 @@ simtel_flat_spectrum_array_01:
 corsika_flat_spectrum_array_03:
   summary: |
     Run CORSIKA with a flat energy spectrum
-    Uses same gamma parameters from corsika_estimate_01, with nshow=13
+    Using gamma, 5SST defaults, nshow=13, max scatter radius = 1500m
     Energy range from 5 - 400 TeV
     79 array jobs
   task: CORSIKA
