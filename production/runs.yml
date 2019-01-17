@@ -150,7 +150,7 @@ simtel_estimate_03:
       parameters:
         time: 00:15:00
         mem-per-cpu: 4MB
-  output: proton_20deg_180deg_run8___cta-prod4-sst-astri+chec-s_desert-2150m-Paranal-sst-astri+chec-s.simtel.zst
+  output: ~/cta/CTA_MC/Data/sim_telarray/cta-prod4-sst-astri+chec-s/0.0deg/Data/proton_20deg_180deg_run8___cta-prod4-sst-astri+chec-s_desert-2150m-Paranal-sst-astri+chec-s.simtel.zst
 corsika_flat_spectrum_01:
   summary: |
     Run CORSIKA with a flat energy spectrum
@@ -262,7 +262,7 @@ simtel_flat_spectrum_array_01:
       parameters:
         array: 15-93
         time: 00:30:00
-  output: ~/cta/CTA_MC/Data/sim_telarray/cta-prod4-sst-astri+chec-s/0.0deg/Data/proton_20deg_180deg_run7___cta-prod4-sst-astri+chec-s_desert-2150m-Paranal-sst-astri+chec-s.simtel.zst
+  output: ~/cta/CTA_MC/Data/sim_telarray/cta-prod4-sst-astri+chec-s/0.0deg/Data/gamma_20deg_180deg_run{15..93}___cta-prod4-sst-astri+chec-s_desert-2150m-Paranal-sst-astri+chec-s.simtel.zst
 corsika_flat_spectrum_array_03:
   summary: |
     Run CORSIKA with a flat energy spectrum
