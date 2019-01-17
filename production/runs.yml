@@ -244,9 +244,8 @@ corsika_flat_spectrum_array_02:
   output: ~/cta/CTA_MC/Data/corsika/run0000{15..93}
 simtel_flat_spectrum_array_01:
   summary: |
-    Run CORSIKA with a flat energy spectrum
-    Uses same gamma parameters from corsika_estimate_01
-    Energy range from 5 - 400 TeV
+    ASTRI+CHECK-S simulation
+    Using output from corsika_flat_spectrum_array_02
     79 array jobs
   task: sim_telarray
   status: COMPLETED
