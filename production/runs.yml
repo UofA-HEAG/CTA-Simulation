@@ -283,3 +283,23 @@ corsika_flat_spectrum_array_03:
         array: 0-78
         time: 1-00:00:00
   output: ~/cta/CTA_MC/Data/corsika/run000{094..172}
+simtel_flat_spectrum_array_02:
+  summary: |
+    ASTRI+CHECK-S simulation
+    Using output from corsika_flat_spectrum_array_03
+    79 array jobs
+  task: sim_telarray
+  status: RUNNING
+  parameters: ~/cta/CTA_MC/sim_telarray/multi/multi_cta-prod4-sst-astri+chec-s.cfg
+  build: build_01
+  staging:
+    base: cta_base
+    job:
+      id: 13833303
+      submit: 2019-01-17 11:30:52+10:30
+      start: 2019-01-17 11:30:53+10:30
+      end:
+      parameters:
+        array: 94-172
+        time: 00:30:00
+  output: ~/cta/CTA_MC/Data/sim_telarray/cta-prod4-sst-astri+chec-s/0.0deg/Data/gamma_20deg_180deg_run{94..172}___cta-prod4-sst-astri+chec-s_desert-2150m-Paranal-sst-astri+chec-s.simtel.zst
