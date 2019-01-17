@@ -265,7 +265,7 @@ simtel_flat_spectrum_array_01:
 corsika_flat_spectrum_array_03:
   summary: |
     Run CORSIKA with a flat energy spectrum
-    Using gamma, 5SST defaults, nshow=13, max scatter radius = 1500m
+    Using gamma, 5 SSTs, nshow=13, max scatter radius = 1500m
     Energy range from 5 - 400 TeV
     79 array jobs
   task: CORSIKA
@@ -303,3 +303,23 @@ simtel_flat_spectrum_array_02:
         array: 94-172
         time: 00:30:00
   output: ~/cta/CTA_MC/Data/sim_telarray/cta-prod4-sst-astri+chec-s/0.0deg/Data/gamma_20deg_180deg_run{94..172}___cta-prod4-sst-astri+chec-s_desert-2150m-Paranal-sst-astri+chec-s.simtel.zst
+corsika_flat_spectrum_array_04:
+  summary: |
+    Run CORSIKA with a flat energy spectrum
+    Using protons, 5 SSTs, nshow=13, max scatter radius = 1500m
+    Energy range from 5 - 400 TeV
+    79 array jobs
+  task: CORSIKA
+  status: RUNNING
+  parameters: ~/cta/CTA_MC/Data/corsika/run0000{173..251}/input
+  build: build_01
+  staging:
+    base: cta_base
+    job:
+      id: 13834694
+      submit: 2019-01-17 13:54:04+10:30
+      start: 2019-01-17 13:54:04+10:30
+      end:
+      parameters:
+        array: 0-78
+  output: ~/cta/CTA_MC/Data/corsika/run000{173..251}
