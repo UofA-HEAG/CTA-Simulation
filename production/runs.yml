@@ -270,7 +270,7 @@ corsika_flat_spectrum_array_03:
     79 array jobs
   task: CORSIKA
   status: COMPLETED
-  parameters: ~/cta/CTA_MC/Data/corsika/run0000{94..172}/input
+  parameters: ~/cta/CTA_MC/Data/corsika/run000{094..172}/input
   build: build_01
   staging:
     base: cta_base
@@ -311,7 +311,7 @@ corsika_flat_spectrum_array_04:
     79 array jobs
   task: CORSIKA
   status: COMPLETED
-  parameters: ~/cta/CTA_MC/Data/corsika/run0000{173..251}/input
+  parameters: ~/cta/CTA_MC/Data/corsika/run000{173..251}/input
   build: build_01
   staging:
     base: cta_base
