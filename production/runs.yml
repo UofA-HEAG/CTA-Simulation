@@ -343,3 +343,24 @@ simtel_flat_spectrum_array_03:
         array: 173-251
         time: 00:10:00
   output: ~/cta/CTA_MC/Data/sim_telarray/cta-prod4-sst-astri+chec-s/0.0deg/Data/proton_20deg_180deg_run{173..251}___cta-prod4-sst-astri+chec-s_desert-2150m-Paranal-sst-astri+chec-s.simtel.zst
+corsika_flat_spectrum_array_05:
+  summary: |
+    Run CORSIKA with a flat energy spectrum
+    Using protons, SSTOnly, nshow=1, PROD4 parameters
+    Energy range from 1 - 400 TeV
+    1050 array jobs
+  task: CORSIKA
+  status: PENDING
+  parameters: ~/cta/CTA_MC/Data/corsika/run00{0252..1301}/input
+  build: build_01
+  staging:
+    base: cta_base
+    job:
+      id: 13944893
+      submit: 2019-01-23 17:02:24+10:30
+      start:
+      end:
+      parameters:
+        array: 0-1049
+        time: 3-00:00:00
+  output: ~/cta/CTA_MC/Data/corsika/run00{0252..1301}

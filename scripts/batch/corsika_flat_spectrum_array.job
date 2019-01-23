@@ -5,15 +5,15 @@
 #SBATCH --get-user-env
 #SBATCH --wait-all-nodes=1
 
-#SBATCH --array=0-78
+#SBATCH --array=0-1049
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
 #SBATCH --dependency=singleton
 
-#SBATCH --time=1-00:00:00
+#SBATCH --time=3-00:00:00
 #SBATCH --mem-per-cpu=512MB
 
-#SBATCH -J corsika_flat_spectrum_array_04
+#SBATCH -J corsika_flat_spectrum_array_05
 
 export OMP_NUM_THREADS=1
 cd $SLURM_SUBMIT_DIR
@@ -21,11 +21,10 @@ ulimit -s unlimited
 
 # scale for bc
 scale=16
-round=1
+round=2
 
-# 1 - 6 TeV
-# 5 - 400 TeV
-ELOW=5.0
+# Full energy bounds in TeV
+ELOW=1.0
 EHIGH=400.0
 
 SCALELOW=$( bc <<< "scale=${scale};${SLURM_ARRAY_TASK_ID}/${SLURM_ARRAY_TASK_COUNT}" )
@@ -43,11 +42,8 @@ echo "EMAX =" $EMAX
 echo "============================="
 echo
 
-# 1000/78 ~ 13 showers
-export NSHOW=13
-# These tell CORSIKA how many copies of the shower/telescope array need to be duplicated around a radius of CSCAT (in metres)
-# Should be 20, not 10, maybe?
-export NSCAT=10
-export CSCAT=1500
+# 1050 total showers
+export NSHOW=1
+# Using default PROD4 shower parameters, so no need to specify them here
 
-~/cta/CTA-Simulation/scripts/prod4_5-sst_run Paranal proton
+~/cta/CTA_MC/example_scripts/Prod4/prod4_sst-only_run Paranal proton
