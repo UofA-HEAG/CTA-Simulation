@@ -13,7 +13,7 @@
 #SBATCH --time=12:00:00
 #SBATCH --mem-per-cpu=1GB
 
-#SBATCH -J corsika_flat_spectrum_array_05p1
+#SBATCH -J corsika_flat_spectrum_array_05p2
 
 export OMP_NUM_THREADS=1
 cd $SLURM_SUBMIT_DIR
@@ -22,6 +22,8 @@ ulimit -s unlimited
 # scale for bc
 scale=16
 round=2
+
+export SLURM_ARRAY_TASK_COUNT=1050
 
 # Full energy bounds in TeV
 ELOW=1.0
