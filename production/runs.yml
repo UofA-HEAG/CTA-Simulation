@@ -350,7 +350,7 @@ corsika_flat_spectrum_array_05:
     Energy range from 1 - 400 TeV
     1050 array jobs
   task: CORSIKA
-  status: PENDING
+  status: MIXED
   parameters: ~/cta/CTA_MC/Data/corsika/run00{0252..1301}/input
   build: build_01
   staging:
@@ -358,8 +358,8 @@ corsika_flat_spectrum_array_05:
     job:
       id: 13944893
       submit: 2019-01-23 17:02:24+10:30
-      start:
-      end:
+      start: 2019-01-23 17:05:51+10:30
+      end: 2019-01-24 01:14:45+10:30
       parameters:
         array: 0-1049
         time: 3-00:00:00
