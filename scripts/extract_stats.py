@@ -23,7 +23,8 @@ SUFFIXES = {
     'E': 60
 }
 
-JOB_TYPES = ['corsika', 'simtel']
+CORSIKA = 'corsika'
+SIMTEL = 'simtel'
 
 
 def proc_to_seconds(val, entry):
@@ -158,7 +159,23 @@ def get_corsika_slurm_map(job_id, slurm_out_dir):
     return res
 
 
-def get_corsika_du(cta_path, r_min, r_max):
+def get_disk_usage(file_globs, r_min):
+    """Retrieves disk usage for given list of file globs and writes to dict"""
+    run_files = sum(map(glob, file_globs), [])
+
+    result = subprocess.Popen(['du'] + run_files,
+                              stdout=subprocess.PIPE)
+
+    res = {}
+
+    for run_no, line in enumerate(result.stdout, start=r_min):
+        byte_size, file_path = line.strip().split()
+        res[run_no] = (float(byte_size), )
+
+    return res
+
+
+def get_corsika_du(cta_path, r_min, r_max, **kwargs):
     """Get disk usage for a range of CORSIKA runs
 
     r_min and r_max are the minimum and maximum CORSIKA run numbers considered,
@@ -174,20 +191,74 @@ def get_corsika_du(cta_path, r_min, r_max):
                            'Data/corsika/run{}/run*.zst'.format(run_no))
                  for run_no in run_stubs]
 
-    # As the glob pattern should only match one file, take the first result
-    # from the output of glob()
-    run_files = map(lambda x: glob(x)[0], run_globs)
+    return get_disk_usage(run_globs, r_min)
 
-    result = subprocess.Popen(['du'] + run_files,
-                              stdout=subprocess.PIPE)
 
-    res = {}
+def get_simtel_du(cta_path, r_min, r_max, sst_type='astri+chec-s'):
+    """Get disk usage for a range of sim_telarray runs
 
-    for run_no, line in enumerate(result.stdout, start=r_min):
-        byte_size, file_path = line.strip().split()
-        res[run_no] = (float(byte_size), )
+    r_min and r_max are the minimum and maximum sim_telarray numbers
+    considered, inclusive. They are equivalent to the CORSIKA run numbers, and
+    so are referred to as such.
 
-    return res
+    sst_type is the type of SST used in the simulation. This shouldn't need to
+    change, but is left as a variable in case it needs to.
+    """
+    if r_max < r_min:
+        raise ValueError('Maximum CORSIKA run smaller than minimum '
+                         '({} < {})'.format(r_max, r_min))
+
+    sim_tel_root = path.join(cta_path, 'Data/sim_telarray',
+                             'cta-prod4-sst-{}'.format(sst_type),
+                             '0.0deg/Data')
+    run_globs = [path.join(sim_tel_root, '*_run{}_*.simtel.zst'.format(i))
+                 for i in xrange(r_min, r_max + 1)]
+
+    return get_disk_usage(run_globs, r_min)
+
+
+GET_DU = {
+    CORSIKA: get_corsika_du,
+    SIMTEL: get_simtel_du,
+}
+
+
+def get_stats(job_id, job_type, mapping, cta_path):
+    """Return usage stats from a given job ID and job type"""
+    min_run_no, max_run_no = min(mapping), max(mapping)
+
+    print('Retrieving stats from SLURM job {}...'.format(job_id))
+    du = GET_DU[job_type](cta_path, min_run_no, max_run_no)
+    entries = get_sacct_stats(job_id)
+
+    tasks = {}
+
+    # Consolidate duplicate entries with merge_rows
+    for task_no, e in entries:
+        if task_no not in tasks:
+            tasks[task_no] = e
+        else:
+            tasks[task_no] = merge_rows(tasks[task_no], e)
+
+    # Process each entry into a usable form
+    for task_no, e in tasks.iteritems():
+        tasks[task_no] = process_entry(e)
+
+    # For CORSIKA, only need to map `du` to SLURM task numbers as `tasks`
+    # already has the correct keys
+    if job_type == CORSIKA:
+        tasks = cat_dict_tuples(tasks, map_to_slurm(du, mapping))
+
+    # For simtel, both dicts are in terms of CORSIKA run number and so
+    # must be mapped to SLURM task number after merging
+    elif job_type == SIMTEL:
+        tasks = map_to_slurm(cat_dict_tuples(tasks, du), mapping)
+
+    else:
+        raise ValueError('Invalid job_type {!r}'.format(job_type))
+
+    # Sort entries and return
+    return sorted(tasks.iteritems(), key=lambda x: x[0])
 
 
 def merge_rows(row1, row2):
@@ -254,11 +325,22 @@ def write_task_to_csv(file, task):
     file.write(','.join(map(str, output)) + '\n')
 
 
+def write_stats(tasks, job_id, job_type):
+    """Write a full set of tasks containing statistics to .csv format"""
+    out_filename = '{}-{}.stat'.format(job_id, job_type)
+    print('Writing stats to {!r}...'.format(out_filename))
+
+    with open(out_filename, 'w') as f:
+        f.write(','.join(OUTPUT_HEADER) + '\n')
+        for task in tasks:
+            write_task_to_csv(f, task)
+
+
 def make_parser():
     """Make the command line argument parser"""
     parser = ArgumentParser(
         description='Extract usage stats from SLURM array jobs and write '
-        'out to file. Works on CORSIKA outputs only.'
+        'out to file.'
     )
 
     def job_id(x):
@@ -276,20 +358,19 @@ def make_parser():
             return x
 
     parser.add_argument(
-        'job_id',
-        metavar='JOB_ID',
+        'corsika_job_id',
+        metavar='CORSIKA_JOB_ID',
         type=job_id,
-        help="a SLURM array job ID without a task number, e.g. '193852'"
+        help='a SLURM array job ID corresponding to a CORSIKA run '
+        "without a task number, e.g. '193852'"
     )
 
     parser.add_argument(
-        '-j', '--job-type',
-        metavar='TYPE',
-        choices=JOB_TYPES,
-        default='corsika',
-        type=str,
-        help='job type to extract from, '
-        'either {} (default: %(default)s)'.format(' or '.join(JOB_TYPES))
+        'simtel_job_id',
+        metavar='SIMTEL_JOB_ID',
+        type=job_id,
+        nargs='?',
+        help='a SLURM array job ID corresponding to a sim_telarray run'
     )
 
     parser.add_argument(
@@ -302,7 +383,7 @@ def make_parser():
     )
 
     parser.add_argument(
-        '-s', '--slurm-output-dir',
+        '-o', '--slurm-output-dir',
         metavar='DIR',
         dest='slurm_out_dir',
         default='/fast/users/{}'.format(getuser()),
@@ -316,40 +397,18 @@ def make_parser():
 def main():
     args = make_parser().parse_args()
 
-    mapping = get_corsika_slurm_map(args.job_id, args.slurm_out_dir)
+    mapping = get_corsika_slurm_map(args.corsika_job_id, args.slurm_out_dir)
 
-    min_run_no, max_run_no = min(mapping), max(mapping)
-    du = get_corsika_du(args.cta_path, min_run_no, max_run_no)
+    corsika_tasks = get_stats(args.corsika_job_id, CORSIKA,
+                              mapping, args.cta_path)
 
-    entries = get_sacct_stats(args.job_id)
+    write_stats(corsika_tasks, args.corsika_job_id, CORSIKA)
 
-    tasks = {}
+    if args.simtel_job_id:
+        simtel_tasks = get_stats(args.simtel_job_id, SIMTEL,
+                                 mapping, args.cta_path)
 
-    # Consolidate duplicate entries with merge_rows
-    for task_no, e in entries:
-        if task_no not in tasks:
-            tasks[task_no] = e
-        else:
-            tasks[task_no] = merge_rows(tasks[task_no], e)
-
-    # Process each entry into a usable form
-    for task_no, e in tasks.iteritems():
-        tasks[task_no] = process_entry(e)
-
-    # Append disk usage information
-    tasks = cat_dict_tuples(tasks, map_to_slurm(du, mapping))
-
-    # Sort entries
-    sorted_tasks = sorted(tasks.iteritems(), key=lambda x: x[0])
-
-    # Write each task to file
-    out_filename = '{}.stat'.format(args.job_id)
-    print('Printing output to {!r}...'.format(out_filename))
-
-    with open(out_filename, 'w') as f:
-        f.write(','.join(OUTPUT_HEADER) + '\n')
-        for task in sorted_tasks:
-            write_task_to_csv(f, task)
+        write_stats(simtel_tasks, args.simtel_job_id, SIMTEL)
 
 
 if __name__ == '__main__':
