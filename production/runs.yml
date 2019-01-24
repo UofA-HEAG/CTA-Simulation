@@ -364,3 +364,22 @@ corsika_flat_spectrum_array_05:
         array: 0-1049
         time: 3-00:00:00
   output: ~/cta/CTA_MC/Data/corsika/run00{0252..1301}
+corsika_flat_spectrum_array_05p1:
+  summary: |
+    Re-running corsika_flat_spectrum_array_05 for array tasks that failed
+  task: CORSIKA
+  status: PENDING
+  parameters: ~/cta/CTA_MC/Data/corsika/run00{1302..1322}/input
+  build: build_01
+  staging:
+    base: cta_base
+    job:
+      id: 13958081
+      submit: 2019-01-24 18:44:50+10:30
+      start:
+      end:
+      parameters:
+        array: 409,457,472,481,484,486,535,542,544,569,571,576,581,599,606,608,614,615,623,629,630
+        time: 12:00:00
+        mem-per-cpu: 1GB
+  output: ~/cta/CTA_MC/Data/corsika/run00{1302..1322}

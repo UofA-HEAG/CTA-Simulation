@@ -5,15 +5,15 @@
 #SBATCH --get-user-env
 #SBATCH --wait-all-nodes=1
 
-#SBATCH --array=0-1049
+#SBATCH --array=409,457,472,481,484,486,535,542,544,569,571,576,581,599,606,608,614,615,623,629,630
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
 #SBATCH --dependency=singleton
 
-#SBATCH --time=3-00:00:00
-#SBATCH --mem-per-cpu=512MB
+#SBATCH --time=12:00:00
+#SBATCH --mem-per-cpu=1GB
 
-#SBATCH -J corsika_flat_spectrum_array_05
+#SBATCH -J corsika_flat_spectrum_array_05p1
 
 export OMP_NUM_THREADS=1
 cd $SLURM_SUBMIT_DIR
