@@ -157,7 +157,7 @@ corsika_flat_spectrum_01:
     Uses same gamma parameters from corsika_estimate_01
     Energy range from 100 GeV - 330 TeV
   task: CORSIKA
-  status: CANCELLED
+  status: FAILED
   parameters: ~/cta/CTA_MC/Data/corsika/run000010/input
   build: build_01
   staging:
@@ -191,7 +191,7 @@ corsika_flat_spectrum_03:
     Uses same gamma parameters from corsika_estimate_01
     Energy range from 10 - 100 TeV
   task: CORSIKA
-  status: CANCELLED
+  status: FAILED
   parameters: ~/cta/CTA_MC/Data/corsika/run000012/input
   build: build_01
   staging:
@@ -229,7 +229,7 @@ corsika_flat_spectrum_array_02:
     Energy range from 5 - 400 TeV
     79 array jobs
   task: CORSIKA
-  status: COMPLETED
+  status: FAILED
   parameters: ~/cta/CTA_MC/Data/corsika/run0000{15..93}/input
   build: build_01
   staging:
