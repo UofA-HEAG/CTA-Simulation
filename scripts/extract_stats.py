@@ -28,13 +28,18 @@ SIMTEL = 'simtel'
 
 
 def proc_to_seconds(val, entry):
-    """Converts minutes to seconds"""
+    """Process a value in minutes to seconds"""
     return 60 * int(val)
 
 
 def proc_to_int(val, entry):
-    """Converts a value to integer"""
+    """Process a value to integer"""
     return int(val)
+
+
+def proc_to_str(val, entry):
+    """Process a value to string"""
+    return str(val)
 
 
 def proc_reqmem_to_bytes(val, entry):
@@ -44,7 +49,7 @@ def proc_reqmem_to_bytes(val, entry):
 
 
 def proc_to_bytes(val, entry):
-    """Converts a value in the form [0-9]+(K|M|G|T|P|E) to bytes
+    """Process a value in the form [0-9]+(K|M|G|T|P|E) to bytes
 
     This method also uses the entry tuple to check if this quantity is defined
     as per node or per CPU by checking the end flag of the ReqMem field. It
@@ -74,6 +79,8 @@ def proc_to_bytes(val, entry):
 
 SacctField = namedtuple('SacctField', 'name process')
 FIELDS = [
+    # job status string
+    SacctField('State', proc_to_str),
     # number of allocated CPUs
     SacctField('AllocCPUS', proc_to_int),
     # number of allocated nodes
@@ -86,10 +93,6 @@ FIELDS = [
     SacctField('MaxRSS', proc_to_bytes),
     # minimum required memory for the job in MB
     SacctField('ReqMem', proc_reqmem_to_bytes),
-    # max number of page faults of all tasks in job
-    SacctField('MaxPages', proc_to_bytes),
-    # max virtual memory size of all tasks in job
-    SacctField('MaxVMSize', proc_to_bytes),
 ]
 FIELD_FMT_STR = 'JobID,' + ','.join(f.name for f in FIELDS)
 
@@ -103,14 +106,13 @@ OutEntry = namedtuple(
 
 OUTPUT_HEADER = [
     'TaskNo',
+    'State',
     'ElapsedTime',
     'RequestedTime',
     'MaxMemUsage',
     'ReqestedMem',
     'OutputFileSize',
-    'MaxVirtualMemUsage',
-    'MaxPageFaults',
-    'PerFlag'
+    'PerFlag',
 ]
 
 
@@ -312,13 +314,12 @@ def write_task_to_csv(file, task):
 
     output = [
         task_no,
+        entry.State,
         entry.ElapsedRaw,
         entry.TimelimitRaw,
         entry.MaxRSS,
         entry.ReqMem[0],
         entry.OutputFileSize,
-        entry.MaxVMSize,
-        entry.MaxPages,
         entry.ReqMem[1],
     ]
 
