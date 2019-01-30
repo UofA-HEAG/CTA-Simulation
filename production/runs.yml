@@ -402,3 +402,25 @@ corsika_flat_spectrum_array_05p2:
         time: 6:00:00
         mem-per-cpu: 1GB
   output: ~/cta/CTA_MC/Data/corsika/run00{1323..1343}
+corsika_flat_spectrum_array_06:
+  summary: |
+    Run CORSIKA with a flat energy spectrum
+    Using gamma, SSTOnly, nshow=1, PROD4 parameters
+    Energy range from 1 - 400 TeV
+    1050 array jobs
+  task: CORSIKA
+  status: PENDING
+  parameters: ~/cta/CTA_MC/Data/corsika/run00{1344..2393}/input
+  build: build_01
+  staging:
+    base: cta_base
+    job:
+      id: 14005335
+      submit: 2019-01-30 11:45:17+10:30
+      start:
+      end:
+      parameters:
+        array: 0-1049
+        time: 12:00:00
+        mem-per-cpu: 1GB
+  output: ~/cta/CTA_MC/Data/corsika/run00{1344..2393}
