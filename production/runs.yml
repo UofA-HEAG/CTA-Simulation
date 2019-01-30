@@ -387,7 +387,7 @@ corsika_flat_spectrum_array_05p2:
   summary: |
     Re-running corsika_flat_spectrum_array_05 for array tasks that failed
   task: CORSIKA
-  status: RUNNING
+  status: COMPLETED
   parameters: ~/cta/CTA_MC/Data/corsika/run00{1323..1343}/input
   build: build_01
   staging:
@@ -396,7 +396,7 @@ corsika_flat_spectrum_array_05p2:
       id: 13960044
       submit: 2019-01-24 22:57:38+10:30
       start: 2019-01-24 22:58:19+10:30
-      end:
+      end: 2019-01-24 23:35:52+10:30
       parameters:
         array: 409,457,472,481,484,486,535,542,544,569,571,576,581,599,606,608,614,615,623,629,630
         time: 6:00:00
