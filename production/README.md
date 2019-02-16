@@ -4,6 +4,28 @@ Production files are used to keep track of different parameters, settings and en
 
 Each file uses [yaml](https://yaml.org/) syntax, so as to be both human- and machine-readable.
 
+
+## Contents
+
+* [Database hierarchy](#database-hierarchy)
+* [Adding a new run](#adding-a-run-to-runsyml)
+* [Adding a new production](adding-a-production-to-productionsyml)
+* [Adding a new set of SLURM staging parameters](#adding-SLURM-parameters-to-stagingyml)
+* [Adding a new build](#adding-a-build-to-buildsyml)
+* [Future work](#future-work)
+
+
+## Database hierarchy
+
+Inside the yaml database there is a hierarchy designed to encapsulate different scopes of the work, which is structured as follows:
+
+* Low level: staging and build parameters
+* Mid level: runs, containing one set of staging and build parameters each
+* High level: productions, containing multiple runs
+
+Staging parameters contain information on parameters used in the job staging process. Build parameters contain dependency versions, compilers and other build parameters used during compilation. Both are required to fully define a run, which may be seen as a combination of input and output parameters, binary executables and SLURM job information. Sitting above this are productions, which are sets of runs with a singular purpose. These can be seen as grouping runs into related projects, and exist purely as an organisational layer.
+
+
 ## Adding a run to `runs.yml`
 
 Following is an example entry for a new run with run ID `example_run_id_01` added to the `runs.yml` file:
@@ -102,3 +124,85 @@ parameters: ~/CTA_MC/Data/corsika/run000{001..100}
 Note also that the number of zeros in the `run` section before the range is also cut, so upon expansion there will always be six digits after `run`.
 
 This padding is not needed for `sim_telarray` runs.
+
+
+## Adding a production to `productions.yml`
+
+The `productions.yml` file groups runs given in `runs.yml` together based on their final purpose. For example, one production could be running CORSIKA to estimate the disk usage and compute time needed. As part of this, runs simulating gammas and protons would be used. Following is an example of what a production entry in `productions.yml` looks like:
+
+```yaml
+example_production:
+  CORSIKA:
+    runs:
+      - example_corsika_run_01
+      - example_corsika_run_02
+      - example_corsika_run_03
+  sim_telarray:
+    runs:
+      - example_simtel_run_01
+      - example_simtel_run_02
+      - example_simtel_run_03
+```
+
+Here, each ID listed under the `runs` field correspond to run entries given in `runs.yml`. Again, `example_production` is a user-defined unique identifier in the same way as with run identifiers.
+
+
+## Adding SLURM parameters to `staging.yml`
+
+The `staging.yml` file contains sets of SLURM staging parameters that may be used by different groups of jobs. For example, a set of staging parameters could be used for `sim_telarray` jobs which usually require less memory and walltime than corresponding CORSIKA jobs. Following is an example of what a staging entry looks like:
+
+```yaml
+example_base_01:
+  scheduler: SLURM
+  parameters:
+    account: cta
+    partition: cpu
+    get-user-env: true
+    ntasks: 1
+    cpus-per-task: 1
+    time: 1-00:00:00
+    mem: 512MB
+```
+
+`example_base_01` is a user-defined ID which can be referred to in a run's `job` section, through the `base` field.
+
+The remaining fields are defined as follows:
+
+* `scheduler`: the job scheduler in use. For Phoenix, this is `SLURM`, but this may be different for other supercomputers
+* `parameters`: a map of (SLURM parameter name, value) pairs as used in `#SLURM` directives in `.job` files
+
+
+## Adding a build to `builds.yml`
+
+The `build.yml` file records version information for tools like compilers used in the building process of the CTA simulation pipeline, as well as the versions of the resulting products. An example build entry looks like the following:
+
+```yaml
+example_build_01:
+  modules:
+    - GCCcore/6.3.0
+  tools:
+    gcc:
+      version: 6.3.0
+  outputs:
+    CORSIKA:
+      version: 6.990
+    IACT/ATMO:
+      version: 1.56
+    sim_telarray:
+      version: 1541504878
+```
+
+Again, `example_build_01` can be any user-defined identifier. It is used in run entries as the value of the `build` field.
+
+The remaining fields are:
+
+* `modules`: any modules loaded through `module load` that were used in compiling the source
+* `tools`: binaries used throughout the build process, including any identifying information such as version number, git commit hash, etc.
+* `outputs`: the resulting products, including any identifying information such as version number, git commit hash, etc.
+
+
+## Future work
+
+Much of the work done in maintaining these databases could be quite easily automated. Due to yaml being both human- and machine-readable, a Python script could be written that updates the appropriate databases when jobs are submitted.
+
+It is expected that the needs of users will change in the future, and so the structure of this database may change to reflect this. For example, an automation script for submission may remove the need to use the `staging.yml` file. If any updates in this vein occur, it is important that documentation is updated and maintained to reflect this. If there is one thing worse than undocumented code, it's outdated documentation.
