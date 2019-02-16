@@ -6,6 +6,10 @@ build_01:
   tools:
     gcc:
       version: 6.3.0
+    zstd:
+      version: 1.3.7
+      arch: x86_64
+      commit: 1b4a9c518bc9f4f16646a6c2f16ebf6150e7c303
   outputs:
     CORSIKA:
       version: 6.990
