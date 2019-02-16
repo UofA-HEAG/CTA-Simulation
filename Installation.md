@@ -31,7 +31,7 @@ ln -s ~/zstd/programs/zstd ~/.local/bin
 ```
 
 * Now the command `zstd` should be able to be run from anywhere.
-* If not, you'll need to add `~/.local/bin` to your path. This can be done by adding the following line into your `~/.bashrc` and then sourcing it, or reopening the connection:
+* If not, you'll need to add `~/.local/bin` to your path. This can be done by adding the following line into your `~/.bashrc` and then sourcing it, or reopening the SSH connection:
 
 ```bash
 export $PATH="~/.local/bin:${PATH}"
@@ -51,12 +51,20 @@ cp ../qgsdat-II-03.dms qgsdat-II-03
 
 If you get your bash prompt back, type `exit` to return back to the build. For whatever reason, the build might stop here just as it's about to execute a csh script. I would also be afraid if I were about to execute a csh script, so I can understand why bash might be a bit apprehensive about it.
 
-The final bit printed out from ths build process should be `Everything built and ready to run the examples.`. You can ignore the `cp` and `/bin/ls` errors as they aren't relevant to the Prod4 work.
+The final bit printed out from the build process should be `Everything built and ready to run the examples.`. You can ignore the `cp` and `/bin/ls` errors as they aren't relevant to the Prod4 work.
 
-* Next, you need to edit the `examples_common.sh` file. Comment out lines 6 and 7 and change line 39 to `export LD_LIBRARY_PATH="${HESSIO_PATH}/lib:${LD_LIBRARY_PATH}"`. This stops `examples_common.sh` from incorrectly assuming the program works when the computer doesn't know where any shared libraries the program needs are.
+* Next, you need to edit the `examples_common.sh` file.
+  * Comment out the following lines near the top of the file:
+
+```bash
+unset LD_LIBRARY_PATH
+export LD_LIBRARY_PATH
+```
+
+  * Change line 39 (starting with `export LD_LIBRARY_PATH`) to `export LD_LIBRARY_PATH="${HESSIO_PATH}/lib:${LD_LIBRARY_PATH}"`. These steps stop `examples_common.sh` from incorrectly assuming the program works when the computer doesn't know where any shared libraries the program needs are.
 * Now, you should be ready to run CORSIKA and sim_telarray!
 
-As an example, you could do this and things shouldn't complain or not work for you:
+As an example, you could run the following and both programs should work without giving any errors:
 
 ```bash
 export NSHOW=1
