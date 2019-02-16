@@ -10,10 +10,21 @@ Jobs may be submitted through the `sbatch` command. Note that output files from 
 
 Before job submission through SLURM, make sure you have
 
-* Checked the script the `.job` file calls on the last line exists
-* Changed to a directory in the `/fast` partition to prevent output files clogging up space in the /home partition
-* Added all necessary run information to `production/runs.yml`, including a non-ambiguous human-readable summary
+* Checked the script the `.job` file calls on the last line exists (and is correct)
+* Changed to a directory in the `/fast` partition to prevent output files clogging up space in the `/home` partition
+* Added all necessary run information to `production/runs.yml`, including a non-ambiguous human-readable summary. See [Adding a new run](../production/README.md#adding-a-run-to-runsyml) for more information on how to do this
 * Specified the correct job name in the `.job` script (the `-J` option)
+
+To make life easier, when submitting a job with an edited `.job` script, push both the `.job` script and the updated `production/runs.yml` file in the same commit. This makes it absolutely clear that the `.job` script in the repository at that time was the one used to submit the job added to `production/runs.yml`. See commits like [2e3e0fc](https://github.com/UofA-HEAG/CTA-Simulation/commit/2e3e0fc1e8ca582e8139e8e92d0e8b947f9ac2ea) and [1cbcd14](https://github.com/UofA-HEAG/CTA-Simulation/commit/1cbcd1496e1cc5bd2dc25018a6d10c8e263bd142) for examples on how this looks.
+
+### Post-Submission Checklist
+
+After submission and beyond, make sure to do the following:
+
+* Check on the job to see when it has finished. See [Email Notification](#email-notification) to see how to get email alerts when this happens
+* Add start and end times to the run's `job` section when appropriate. These times are found using the `rcstat <SLURM job id>` command
+  * Make sure to add the current timezone (replacing the `T` with a space and adding _e.g._ `+10:30` to the end), as this is important when considering daylight savings
+* Update the run's `status` as needed
 
 ### Email Notification
 
