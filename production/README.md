@@ -9,7 +9,7 @@ Each file uses [yaml](https://yaml.org/) syntax, so as to be both human- and mac
 
 * [Database hierarchy](#database-hierarchy)
 * [Adding a new run](#adding-a-run-to-runsyml)
-* [Adding a new production](adding-a-production-to-productionsyml)
+* [Adding a new production](#adding-a-production-to-productionsyml)
 * [Adding a new set of SLURM staging parameters](#adding-SLURM-parameters-to-stagingyml)
 * [Adding a new build](#adding-a-build-to-buildsyml)
 * [Future work](#future-work)
