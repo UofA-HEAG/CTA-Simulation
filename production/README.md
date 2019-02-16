@@ -24,6 +24,8 @@ example_run_id_01:
       submit: 2019-01-31 00:00:00+10:30
       start: 2019-01-31 00:01:00+10:30
       end: 2019-01-31 12:00:00+10:30
+      parameters:
+        mem: 512MB
   output: ~/CTA_MC/Data/corsika/run000001
 ```
 
@@ -48,6 +50,7 @@ The remaining fields are as follows:
     * `submit`: time of submission to SLURM queue, including timezone
     * `start`: time job began running, including timezone. Only present if job is not `PENDING`
     * `end`: time job finished running, including timezone. Only present if `COMPLETED`, `MIXED` or `FAILED`
+    * `parameters`: (optional) a list of SLURM parameters that are changed relative to the ones given by the staging `base` field
 * `output`: path to directory containing output files
 
 ### CORSIKA
