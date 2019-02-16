@@ -17,3 +17,34 @@ ProdUofA_Paranal_SST5_Estim_North_20deg:
       - simtel_estimate_01
       - simtel_estimate_02
       - simtel_estimate_03
+ProdUofA_Paranal_SST70_Flat_Spectrum_Full_North_20deg:
+  CORSIKA:
+    runs:
+      - corsika_flat_spectrum_01
+      - corsika_flat_spectrum_02
+      - corsika_flat_spectrum_03
+ProdUofA_Paranal_SST70_Flat_Spectrum_Array_North_20deg:
+  CORSIKA:
+    runs:
+      - corsika_flat_spectrum_array_01
+      - corsika_flat_spectrum_array_02
+  sim_telarray:
+    runs:
+      - simtel_flat_spectrum_array_01
+ProdUofA_Paranal_SST5_Flat_Spectrum_Array_North_20deg:
+  CORSIKA:
+    runs:
+      - corsika_flat_spectrum_array_03
+      - corsika_flat_spectrum_array_04
+  sim_telarray:
+    runs:
+      - simtel_flat_spectrum_array_02
+      - simtel_flat_spectrum_array_03
+ProdUofA_Paranal_SST5_Flat_Spectrum_Array_North_20deg_nshow1:
+  CORSIKA:
+    runs:
+      - corsika_flat_spectrum_array_05
+      - corsika_flat_spectrum_array_05p1
+      - corsika_flat_spectrum_array_05p2
+      - corsika_flat_spectrum_array_06
+      - corsika_flat_spectrum_array_07
