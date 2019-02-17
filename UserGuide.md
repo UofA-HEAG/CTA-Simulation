@@ -6,7 +6,7 @@ This document serves as a brief introduction to the CTA simulation pipeline and 
 
 * [The Simulation Pipeline](#the-simulation-pipeline)
   * [CORSIKA](#corsika)
-  * [`sim_telarray`](#sim-telarray)
+  * [`sim_telarray`](#sim_telarray)
 * [Phoenix](#phoenix)
   * [Modules](#modules)
   * [SLURM](#slurm)
@@ -27,17 +27,17 @@ This chapter will present a surface overview of both programs, with any further 
 
 ### CORSIKA
 
-CORSIKA [1] is a program originally written for the KASKADE experiment in the late 90s.
+CORSIKA [[1](#bibliography)] is a program originally written for the KASKADE experiment in the late 90s.
 It is primarily written in fixed format Fortran 77, and supports different particle interaction models which are used to simulate particle air showers through the Earth's atmosphere.
-The model used for CTA simulations is the QGSJET-II model [2].
+The model used for CTA simulations is the QGSJET-II model [[2](#bibliography)].
 CORSIKA also supports various packages that extend the default behaviour.
-As part of the CTA toolkit, CORSIKA uses the IACT/ATMO package [3] to gather emitted Cherenkov light from air shower events that are incident on an array of telescopes.
+As part of the CTA toolkit, CORSIKA uses the IACT/ATMO package [[3](#bibliography)] to gather emitted Cherenkov light from air shower events that are incident on an array of telescopes.
 
 The Prod4 CTA toolkit uses CORSIKA v6.990, whose user guide should be included in some format alongside this guide.
 
 ### `sim_telarray`
 
-`sim_telarray` [4] \(also known as `sim_hessarray`\) is a program written to simulate how telescopes receive and process the Cherenkov light received from air showers.
+`sim_telarray` [[4](#bibliography)] \(also known as `sim_hessarray`\) is a program written to simulate how telescopes receive and process the Cherenkov light received from air showers.
 Primarily written in C, the program works with output from the IACT/ATMO CORSIKA package.
 
 The Prod4 CTA toolkit uses `sim_telarray` v1541504878.
@@ -128,6 +128,9 @@ This reports the number of CPUs that are either on an idle, unused node (`idle`)
 ## Bibliography
 
 [1] D. Heck et al. _CORSIKA: A Monte Carlo code to simulate extensive air showers._ Tech. rep. FZKA-6019; LK 01; Wissenshaftliche Berchte. Karlsruher Institut Für Technologie, 1998-02.
+
 [2] S. Ostapchenko. "QGSGET-II: Towards reliable description of very high energy hadronic interactions." In: _Nucl. Phys. Proc. Suppl._ 151 (2006), pp. 143-146. DOI: [10.1016/j.nuclphysbps.2005.07.026](http://dx.doi.org/10.1016/j.nuclphysbps.2005.07.026). arXiv: [hep-ph/0412332 [hep-ph]](https://arxiv.org/abs/hep-ph/0412332).
+
 [3] K. Bernlöhr. _The IACT/ATMO package for CORSIKA_. 2017-10. URL: [https://www.mpi-hd.mpg.de/hfm/bernlohr/iact-atmo/](https://www.mpi-hd.mpg.de/hfm/bernlohr/iact-atmo/).
+
 [4] K. Bernlöhr. _The sim\_telarray program for simulating atomspheric Cherenkov telescopes_. 2018-08. URL: [https://www.mpi-hd.mpg.de/hfm/bernlohr/sim_telarray/](https://www.mpi-hd.mpg.de/hfm/bernlohr/sim_telarray/).
