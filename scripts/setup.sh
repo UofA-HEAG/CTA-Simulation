@@ -7,24 +7,40 @@ if [ ! -d ${FAST_PARTITION}/Data ]; then
   ln -s ${FAST_PARTITION}/Data ${CTA_PATH}
 fi
 
-# Ask if users want to have links to .job files in their /fast partition
-# This is just a quality-of-life option so calls to sbatch in /fast don't need to specify the full path to the .job file
-while true; do
-  read -p "Would you like to create .job file links in ${FAST_PARTITION}? [y/N] " reply
-
-  if [ -z $reply ]; then
-    reply=N
+ask() {
+  # Prompt users to do something
+  if [ "${2:-}" = "Y" ]; then
+    prompt="Y/n"
+    default=Y
+  elif [ "${2:-}" = "N" ]; then
+    prompt="y/N"
+    default=N
+  else
+    prompt="y/n"
+    default=
   fi
 
-  case "$reply" in
-    Y*|y*)
-      for job in $( ls ${REPO_PATH}/scripts/batch/*.job ); do
-        ln -sf $( readlink -f $job ) ${FAST_PARTITION}/$( basename $job )
-      done
-      ;;
-    N*|n*)
-      break ;;
-  esac
+  while true; do
+    # Prompt question
+    read -p "$1 [$prompt] " reply
 
-  printf "Invalid reply '%s'\n" $reply
-done
+    # Set default if no reply
+    if [ -z $reply ]; then
+        reply=$default
+    fi
+
+    # Check if the reply is valid
+    case "$reply" in
+      Y*|y*) return 0 ;;
+      N*|n*) return 1 ;;
+    esac
+  done
+}
+
+# Ask if users want to have links to .job files in their /fast partition
+# This is just a quality-of-life option so calls to sbatch in /fast don't need to specify the full path to the .job file
+if ask "Would you like to create .job file symlinks in ${FAST_PARTITION}?" N; then
+  for job in $( ls ${REPO_PATH}/scripts/batch/*.job ); do
+    ln -sf $( readlink -f $job ) ${FAST_PARTITION}/$( basename $job )
+  done
+fi
