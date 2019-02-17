@@ -1,0 +1,341 @@
+#!/usr/bin/env python
+# 16/08/2017 - Harry Poulter
+
+from __future__ import division, print_function
+
+import argparse
+import re
+from subprocess import check_output, CalledProcessError
+
+MIXED = "mix"
+IDLE = "idle"
+
+DEFAULT_QUEUE = "cpu"
+OMP_THREADS = 4
+
+DECODE_FORMAT = "utf-8"
+
+
+def main():
+    parser = make_parser()
+    args = parser.parse_args()
+
+    # Mixed cpus
+    mix_nodes = get_nodes(status=MIXED, partition=args.queue)
+    if args.nodelist_exclude:
+        mix_nodes = exclude_nodes(mix_nodes, args.nodelist_exclude)
+
+    total_mix_nodes = len(mix_nodes)
+    alloc_mix_cpus = get_alloc_cpus(mix_nodes)
+    all_mix_cpus = get_total_cpus(mix_nodes)
+
+    free_mix_cpus = [
+        all_cpu - cpu for cpu, all_cpu in zip(alloc_mix_cpus, all_mix_cpus)
+    ]
+    total_free_mix_cpus = sum(free_mix_cpus)
+
+    free_mix_omp_cpus = get_omp_cpus(
+        free_mix_cpus, omp_threads=args.omp_num_threads
+    )
+    total_free_mix_omp_cpus = sum(free_mix_omp_cpus)
+
+    total_mix_tasks = total_free_mix_omp_cpus // args.omp_num_threads
+
+    # Idle cpus
+    idle_nodes = get_nodes(status=IDLE, partition=args.queue)
+    if args.nodelist_exclude:
+        idle_nodes = exclude_nodes(idle_nodes, args.nodelist_exclude)
+
+    total_idle_nodes = len(idle_nodes)
+    all_idle_cpus = get_total_cpus(idle_nodes)
+
+    free_idle_cpus = all_idle_cpus
+    total_free_idle_cpus = sum(free_idle_cpus)
+
+    free_idle_omp_cpus = get_omp_cpus(
+        free_idle_cpus, omp_threads=args.omp_num_threads
+    )
+    total_free_idle_omp_cpus = sum(free_idle_omp_cpus)
+
+    total_idle_tasks = total_free_idle_omp_cpus // args.omp_num_threads
+
+    # Total cpus
+    total_nodes = total_mix_nodes + total_idle_nodes
+    total_free_cpus = total_free_mix_cpus + total_free_idle_cpus
+    total_free_omp_cpus = total_free_mix_omp_cpus + total_free_idle_omp_cpus
+    total_tasks = total_mix_tasks + total_idle_tasks
+
+    # Node memory
+    mix_memory = get_node_memory(mix_nodes)
+    idle_memory = get_node_memory(idle_nodes)
+
+    avg_mix_memory = convert_memory(mean(mix_memory))
+    avg_idle_memory = convert_memory(mean(idle_memory))
+
+    # CPU load
+    avg_mix_load = mean(iter_div(get_cpu_load(mix_nodes), all_mix_cpus))
+    avg_idle_load = mean(iter_div(get_cpu_load(idle_nodes), all_idle_cpus))
+
+    num_cols = 7
+    col_width = 11
+    col_fmt = "{{:<{}}}".format(col_width)
+
+    bar_width = num_cols * col_width + (num_cols - 1)
+    bar = "-" * bar_width
+
+    def print_row(*cols):
+        assert len(cols) == num_cols
+        col_fmts = [col_fmt.format(col) for col in cols]
+        print(*col_fmts)
+
+    # Print out results
+    print_row(
+        "status",
+        "nodes",
+        "free cpus",
+        "OMP={} cpus".format(args.omp_num_threads),
+        "tasks",
+        "mem/node",
+        "cpu load",
+    )
+
+    print(bar)
+
+    print_row(
+        MIXED,
+        total_mix_nodes,
+        total_free_mix_cpus,
+        total_free_mix_omp_cpus,
+        total_mix_tasks,
+        "{:.3g} {}".format(*avg_mix_memory),
+        "{:.1%}".format(avg_mix_load),
+    )
+
+    print_row(
+        IDLE,
+        total_idle_nodes,
+        total_free_idle_cpus,
+        total_free_idle_omp_cpus,
+        total_idle_tasks,
+        "{:.3g} {}".format(*avg_idle_memory),
+        "{:.1%}".format(avg_idle_load),
+    )
+
+    print_row(
+        "total",
+        total_nodes,
+        total_free_cpus,
+        total_free_omp_cpus,
+        total_tasks,
+        "NA",
+        "NA",
+    )
+
+    # Write state
+    if args.write_state:
+        with open("{}.nodes".format(args.job_id), "w") as file:
+            file.write("node\talloc\tidle\tomp\tused\n")
+            for node, alloc_cpu, free_cpu, omp_cpu in zip(
+                mix_nodes, alloc_mix_cpus, free_mix_cpus, free_mix_omp_cpus
+            ):
+                file.write(
+                    "{}\t{}\t{}\t{}\t\n".format(
+                        node, alloc_cpu, free_cpu, omp_cpu
+                    )
+                )
+
+
+def exclude_nodes(nodes, excluded_nodes):
+    """Remove nodes from nodes that appear in excluded_nodes"""
+    return [node for node in nodes if node not in excluded_nodes]
+
+
+def get_nodes(status=None, partition=None):
+    """Return list of nodes"""
+    cmd = ["sinfo", "-h", "-o", "%n"]
+    if status:
+        cmd.extend(["-t", status])
+    if partition:
+        cmd.extend(["-p", partition])
+    nodes = check_output(cmd).split()
+    return [node.decode(DECODE_FORMAT) for node in nodes]
+
+
+def get_alloc_cpus(node_list):
+    """Return the number of allocated CPUs for each node"""
+    alloc_cpus = get_node_feature(",".join(node_list), "CPUAlloc")
+    return list(map(int, alloc_cpus))
+
+
+def get_total_cpus(node_list):
+    """Return total number of CPUs for each node"""
+    total_cpus = get_node_feature(",".join(node_list), "CPUTot")
+    return list(map(int, total_cpus))
+
+
+def get_node_memory(node_list):
+    """Return available memory for each node"""
+    node_memory = get_node_feature(",".join(node_list), "FreeMem")
+    return list(map(int, node_memory))
+
+
+def get_cpu_load(node_list):
+    """Return CPU load for each node"""
+    cpu_load = get_node_feature(",".join(node_list), "CPULoad")
+    return list(map(float, cpu_load))
+
+
+def convert_memory(mem):
+    units = ["MB", "GB", "TB"]
+    i = 0
+    unit = units[i]
+    while mem >= 1024:
+        i += 1
+        mem /= 1024
+        unit = units[i]
+    return (mem, unit)
+
+
+def mean(iterable):
+    if iterable:
+        return sum(iterable) / len(iterable)
+    else:
+        return 0.0
+
+
+def iter_div(iter1, iter2):
+    """Divide two same-length iterators element-wise"""
+    assert len(iter1) == len(iter2)
+    return [i1 / i2 for i1, i2 in zip(iter1, iter2)]
+
+
+def get_node_feature(node_str, feature):
+    """Return field value for list of nodes"""
+    NODE_ERR = "Invalid nodes {!r}".format(node_str)
+
+    try:
+        info = check_output(["scontrol", "show", "node", node_str])
+    except CalledProcessError:
+        raise ValueError(NODE_ERR)
+
+    matches = re.findall(
+        r".*{}=([^\s]+).*".format(feature), info.decode(DECODE_FORMAT)
+    )
+
+    if node_str and not matches:
+        raise ValueError("Couldn't find {!r} field".format(feature))
+
+    return matches
+
+
+def get_omp_cpus(cpus, omp_threads=OMP_THREADS):
+    """Return the number of CPUs available for OMP usage
+
+    Effectively floors the number of idle CPUs from each node to nearest
+    number divisible by omp_threads.
+    """
+
+    def omp_floor(x):
+        return (x // omp_threads) * omp_threads
+
+    return list(map(omp_floor, cpus))
+
+
+def make_parser():
+    parser = argparse.ArgumentParser(
+        description="%(prog)s, return information about cpu usage."
+    )
+
+    parser.add_argument(
+        "-s",
+        "--state",
+        action="store_true",
+        dest="write_state",
+        help="write current CPU state to file",
+    )
+
+    parser.add_argument(
+        "-j",
+        "--job-id",
+        type=str,
+        dest="job_id",
+        default="slurm_job",
+        help="set job id",
+    )
+
+    parser.add_argument(
+        "-o",
+        "--omp-threads",
+        type=int,
+        default=OMP_THREADS,
+        dest="omp_num_threads",
+        help="set # of OMP threads (default: {})".format(OMP_THREADS),
+    )
+
+    parser.add_argument(
+        "-p",
+        "--partition",
+        type=str,
+        default=DEFAULT_QUEUE,
+        dest="queue",
+        help="set partition (default: {})".format(DEFAULT_QUEUE),
+    )
+
+    parser.add_argument(
+        "-x",
+        "--exclude",
+        action=NodeListAction,
+        type=str,
+        dest="nodelist_exclude",
+        help="set nodes to exclude",
+    )
+
+    return parser
+
+
+class NodeListAction(argparse.Action):
+    """Class to process node lists during argument parsing"""
+
+    def __init__(self, option_strings, dest, nargs=None, **kwargs):
+        if nargs is not None:
+            raise ValueError("nargs not allowed")
+        super(NodeListAction, self).__init__(option_strings, dest, **kwargs)
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        requested_node_list = NodeListAction.expand_node_list(values)
+
+        setattr(namespace, self.dest, requested_node_list)
+
+    @staticmethod
+    def expand_node_list(node_list):
+        expanded_node_list = []
+
+        # Find rack denominations
+        racks = re.findall(r"r[0-9]+n\[?[0-9,\-]+\]?", node_list)
+
+        for rack in racks:
+            rack_id = re.match(r"r([0-9]+)n", rack).group(1)
+
+            # Find node denominations
+            nodes = re.search(r"n\[?([0-9,\-]+)\]?", rack).group(1).split(",")
+            nodes = [x for x in nodes if x != ""]
+
+            for node in nodes:
+                node_id = ""
+                if "-" not in node:
+                    node_id = node
+                    expanded_node_list.append(
+                        "r{}n{}".format(rack_id, node_id)
+                    )
+                else:
+                    node_range = list(map(lambda x: int(x), node.split("-")))
+                    for node_id in range(node_range[0], node_range[1] + 1):
+                        expanded_node_list.append(
+                            "r{}n{:02}".format(rack_id, node_id)
+                        )
+
+        return set(expanded_node_list)
+
+
+if __name__ == "__main__":
+    exit(main())

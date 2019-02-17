@@ -44,3 +44,11 @@ if ask "Would you like to create .job file symlinks in ${FAST_PARTITION}?" N; th
     ln -sf $( readlink -f $job ) ${FAST_PARTITION}/$( basename $job )
   done
 fi
+
+get_cpus="scripts/get-cpus"
+
+if [ ! -d ${HOME}/.local/bin ]; then
+  >&2 echo "You do not have a ~/.local/bin directory. Some scripts are not able to be installed correctly. Please make this directory and run the setup again."
+else
+  ask "Install symlink for $get_cpus?" Y && ln -sf $( readlink -f $get_cpus ) ${HOME}/.local/bin/$( basename $get_cpus )
+fi
