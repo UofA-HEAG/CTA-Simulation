@@ -15,5 +15,6 @@ This script prepares the default CTA toolkit to be run on Phoenix using the data
 ## Contents
 
 * [Installation](Installation.md)
+* [User Guide](UserGuide.md)
 * [Managing the yaml database](production/README.md)
 * [Using submission scripts](scripts/README.md)
